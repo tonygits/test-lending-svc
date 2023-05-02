@@ -11,6 +11,10 @@ on:
     branches:
       - 'main'
 
+env:
+  REGISTRY: "registry.hub.docker.com/v2"
+  LENDING_APP_API_IMAGE_NAME: "test-lending-svc"
+
 jobs:
   test:
     name: Test
@@ -65,7 +69,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # setup Docker buld action
+      # setup Docker build action
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v2
@@ -83,6 +87,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.G_TOKEN }}
 
+      - name: Build api image
+          run: docker build --tag $(echo $REGISTRY)/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) .
+
+      - name: Remove api old images
+          run: if [ ! -z "$(doctl registry repository list | grep "$(echo $LENDING_APP_API_IMAGE_NAME)")" ]; then doctl registry repository delete-manifest $(echo $LENDING_APP_API_IMAGE_NAME) $(doctl registry repository list-tags $(echo $LENDING_APP_API_IMAGE_NAME) | grep -o "sha.*") --force; else echo "No repository"; fi
+
+      - name: Push api image to Container Registry
+        run: docker push $(echo $REGISTRY)/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+
       - name: Build image and push to Docker Hub and GitHub Container Registry
         uses: docker/build-push-action@v2
         with:
@@ -90,8 +103,9 @@ jobs:
           context: ./
           # Note: tags has to be all lower-case
           tags: |
-            tonygits/test-lending-svc:${{ github.sha }}
+            mrgitau/test-lending-svc:${{ github.sha }}
             ghcr.io/mrgitau/test-lending-svc:${{ github.sha }}
+
           # build on feature branches, push only on main branch
           push: ${{ github.ref == 'refs/heads/master' }}
 
