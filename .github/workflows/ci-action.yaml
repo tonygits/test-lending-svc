@@ -15,8 +15,6 @@ env:
   REGISTRY: "index.docker.io"
   DOCKER_USERNAME: "mrgitau"
   LENDING_APP_API_IMAGE_NAME: "test-lending-svc"
-  MANIFEST_REPO: "lending-app-infra"
-  GITHUB_USERNAME: "tonygits"
 
 jobs:
   test:
@@ -108,7 +106,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          repository: $(echo $GITHUB_USERNAME)/$(echo $MANIFEST_REPO)
+          repository: tonygits/lending-app-infra
           ref: 'main'
           token: ${{ secrets.G_TOKEN }}
       - name: setup git config
