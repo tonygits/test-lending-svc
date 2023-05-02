@@ -64,9 +64,9 @@ jobs:
         run: |
           git config --global user.email "gitau.ag@gmail.com"
           git config --global user.name "Anthony Gitau"
-          echo ${{ github.sha }}
-          sed -i "s#$(echo $DOCKER_USERNAME).*#$(echo $DOCKER_USERNAME)/$(echo $LENDING_APP_API_IMAGE_NAME):${{ github.sha }}#g" deployment.yaml
+          echo $(echo $GITHUB_SHA | head -c7)
+          sed -i "s#$(echo $DOCKER_USERNAME).*#$(echo $DOCKER_USERNAME)/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)#g" deployment.yaml
           git add -A
-          git commit -am "Update image for - ${{ github.sha }}"
-      - run: echo ${{ github }}
+          git commit -am "Update image for - $(echo $GITHUB_SHA | head -c7)"
+      - run: echo $(echo $GITHUB_SHA | head -c7)
       - run: git push origin main
