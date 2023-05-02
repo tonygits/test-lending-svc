@@ -68,5 +68,4 @@ jobs:
           sed -i "s#$(echo $DOCKER_USERNAME).*#$(echo $DOCKER_USERNAME)/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)#g" deployment.yaml
           git add -A
           git commit -am "Update image for - $(echo $GITHUB_SHA | head -c7)"
-      - run: echo 'push changes'
       - run: git push origin main
