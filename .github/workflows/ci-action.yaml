@@ -88,10 +88,10 @@ jobs:
           password: ${{ secrets.G_TOKEN }}
 
       - name: Build api image
-          run: docker build --tag registry.hub.docker.com/v2/test-lending-svc:${{ github.sha }} .
+        run: docker build --tag registry.hub.docker.com/v2/test-lending-svc:${{ github.sha }} .
 
       - name: Remove api old images
-          run: if [ ! -z "$(doctl registry repository list | grep "test-lending-svc")" ]; then doctl registry repository delete-manifest test-lending-svc $(doctl registry repository list-tags test-lending-svc | grep -o "sha.*") --force; else echo "No repository"; fi
+        run: if [ ! -z "$(doctl registry repository list | grep "test-lending-svc")" ]; then doctl registry repository delete-manifest test-lending-svc $(doctl registry repository list-tags test-lending-svc | grep -o "sha.*") --force; else echo "No repository"; fi
 
       - name: Push api image to Container Registry
         run: docker push registry.hub.docker.com/v2/test-lending-svc:${{ github.sha }}
