@@ -18,6 +18,4 @@ RUN mkdir /app
 
 COPY --from=builder /app/main /app
 
-EXPOSE 8099
-
 CMD [ "/app/main" ]

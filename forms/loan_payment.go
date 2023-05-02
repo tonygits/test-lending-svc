@@ -1,6 +1,6 @@
 package forms
 
 type LoanPayment struct {
-	Username   string  `json:"username"`
-	LoanAmount float64 `json:"loan_amount"`
+	Username   string  `binding:"required" json:"username"`
+	LoanAmount float64 `binding:"required" json:"loan_amount"`
 }
