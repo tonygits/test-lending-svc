@@ -12,7 +12,7 @@ on:
       - 'main'
 
 env:
-  REGISTRY: "registry.hub.docker.com/v2"
+  REGISTRY: "https://index.docker.io"
   LENDING_APP_API_IMAGE_NAME: "test-lending-svc"
 
 jobs:
