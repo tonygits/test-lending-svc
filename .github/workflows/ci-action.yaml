@@ -88,13 +88,13 @@ jobs:
           password: ${{ secrets.G_TOKEN }}
 
       - name: Build api image
-          run: docker build --tag $(echo $REGISTRY)/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) .
+          run: docker build --tag registry.hub.docker.com/v2/test-lending-svc:${{ github.sha }} .
 
       - name: Remove api old images
-          run: if [ ! -z "$(doctl registry repository list | grep "$(echo $LENDING_APP_API_IMAGE_NAME)")" ]; then doctl registry repository delete-manifest $(echo $LENDING_APP_API_IMAGE_NAME) $(doctl registry repository list-tags $(echo $LENDING_APP_API_IMAGE_NAME) | grep -o "sha.*") --force; else echo "No repository"; fi
+          run: if [ ! -z "$(doctl registry repository list | grep "test-lending-svc")" ]; then doctl registry repository delete-manifest test-lending-svc $(doctl registry repository list-tags test-lending-svc | grep -o "sha.*") --force; else echo "No repository"; fi
 
       - name: Push api image to Container Registry
-        run: docker push $(echo $REGISTRY)/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+        run: docker push registry.hub.docker.com/v2/test-lending-svc:${{ github.sha }}
 
       - name: Build image and push to Docker Hub and GitHub Container Registry
         uses: docker/build-push-action@v2
