@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - 'main'
+  workflow_call:
 
 jobs:
   compile-and-test:
@@ -48,7 +49,7 @@ jobs:
         run: go build -o toprated main.go
 
       # run tests
-      - name: Test
+      - name: Run Test
         run: go test -v -cover ./...
 
 
