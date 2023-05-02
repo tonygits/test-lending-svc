@@ -5,65 +5,72 @@ name: Build Step
 
 on:
   push:
-    branches: ['main']
-#   pull_request:
-#     branches: [ "main" ]
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+
+env:
+  REGISTRY: "index.docker.io"
+  DOCKER_USERNAME: "mrgitau"
+  LENDING_APP_API_IMAGE_NAME: "test-lending-svc"
 
 jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-  steps:
-    #set up go version
-    - name: Set up go 1.17
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.17
+    # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+    steps:
+      #set up go version
+      - name: Set up go 1.17
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.17
 
-    #checkout repo
-    - name: checkout repo
-      uses: actions/checkout@v3
+      #checkout repo
+      - name: checkout repo
+        uses: actions/checkout@v3
 
-    #cache go modules
-    - name: cache go modules
-      uses: actions/cache@preview
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-build-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.OS }}-build-${{ env.cache-name }}-
-          ${{ runner.OS }}-build-
-          ${{ runner.OS }}-
+      #cache go modules
+      - name: cache go modules
+        uses: actions/cache@preview
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-build-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.OS }}-build-${{ env.cache-name }}-
+            ${{ runner.OS }}-build-
+            ${{ runner.OS }}-
 
-    #install static check
-    - name: install static check
-      run: go install honnef.co/go/tools/cmd/staticcheck@v0.2.2
+      #install static check
+      - name: install static check
+        run: go install honnef.co/go/tools/cmd/staticcheck@v0.2.2
 
-    #run static check
-    - name: run static checks
-      run: ~/go/bin/staticcheck ./...
+      #run static check
+      - name: run static checks
+        run: ~/go/bin/staticcheck ./...
 
-    # build app
-    - name: build lending app
-      run: go build -o toprated main.go
+      # build app
+      - name: build lending app
+        run: go build -o toprated main.go
 
-    # run tests
-    - name: Test
-      run: go test -v -cover ./...
+      # run tests
+      - name: Test
+        run: go test -v -cover ./...
 
   build-and-push-docker-image:
     name: Build Docker image and push to repositories
     # run only when code is compiling and tests are passing
     runs-on: ubuntu-latest
-    needs: ['build', 'test-stage']
+    needs: [ 'test' ]
 
     # steps to perform in job
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # setup Docker buld action
+      # setup Docker build action
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v2
@@ -81,24 +88,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.G_TOKEN }}
 
-      - name: Build image and push to Docker Hub and GitHub Container Registry
-        uses: docker/build-push-action@v2
-        with:
-          # relative path to the place where source code with Dockerfile is located
-          context: ./
-          # Note: tags has to be all lower-case
-          tags: |
-            tonygits/test-lending-svc:${{ github.sha }}
-            ghcr.io/mrgitau/test-lending-svc:${{ github.sha }}
-          # build on feature branches, push only on main branch
-          push: ${{ github.ref == 'refs/heads/master' }}
+      - name: Build image
+        run: docker build --tag $(echo $REGISTRY)/$(echo $DOCKER_USERNAME)/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) .
+
+      - name: Remove old images
+        run: if [ ! -z "$(doctl registry repository list | grep "$(echo $LENDING_APP_API_IMAGE_NAME)")" ]; then doctl registry repository delete-manifest $(echo $LENDING_APP_API_IMAGE_NAME) $(doctl registry repository list-tags $(echo $LENDING_APP_API_IMAGE_NAME) | grep -o "sha.*") --force; else echo "No repository"; fi
+
+      - name: Push image to Container Registry
+        run: docker push $(echo $REGISTRY)/$(echo $DOCKER_USERNAME)/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
   update-manifest-stage:
     runs-on: ubuntu-latest
-    needs: ['build-and-push-docker-image']
+    needs: [ 'build-and-push-docker-image' ]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -108,10 +112,10 @@ jobs:
       - name: setup git config
         run: |
           git config --global user.email "gitau.ag@gmail.com"
-          git config --global user.name "tonygits"
+          git config --global user.name "Anthony Gitau"
           echo ${{ github.sha }}
-          sed -i "s#${{ github.actor }}.*#${{ github.actor }}/test-lending-svc:${{ github.sha }}#g" deployment.yaml
+          sed -i "s#$(echo $DOCKER_USERNAME).*#$(echo $DOCKER_USERNAME)/$(echo $LENDING_APP_API_IMAGE_NAME):${{ github.sha }}#g" deployment.yaml
           git add -A
           git commit -am "Update image for - ${{ github.sha }}"
       - run: echo ${{ github }}
-      - run: git push origin master
+      - run: git push origin main

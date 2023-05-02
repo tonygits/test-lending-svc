@@ -26,7 +26,7 @@ func TestLoanPayment(t *testing.T) {
 		LoanAmount: 1500,
 	}
 
-	userLoan, status, err = userLoanPayment(form)
+	_, status, err = userLoanPayment(form)
 	require.Error(t, err)
 	require.Equal(t, "exact loan amount must be paid in full", err.Error())
 	require.Equal(t, http.StatusBadRequest, status)
@@ -37,7 +37,7 @@ func TestLoanPayment(t *testing.T) {
 		LoanAmount: 1100,
 	}
 
-	userLoan, status, err = userLoanPayment(form)
+	_, status, err = userLoanPayment(form)
 	require.Error(t, err)
 	require.Equal(t, "user does not exist", err.Error())
 	require.Equal(t, http.StatusNotFound, status)
