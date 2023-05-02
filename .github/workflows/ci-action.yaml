@@ -88,10 +88,10 @@ jobs:
           password: ${{ secrets.G_TOKEN }}
 
       - name: Build api image
-        run: docker build --tag $(echo $REGISTRY)/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) .
+        run: docker build --tag $(echo $REGISTRY)/mrgitau/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) .
 
       - name: Push api image to Container Registry
-        run: docker push $(echo $REGISTRY)/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+        run: docker push $(echo $REGISTRY)/mrgitau/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
 
       - name: Build image and push to Docker Hub and GitHub Container Registry
         uses: docker/build-push-action@v2
