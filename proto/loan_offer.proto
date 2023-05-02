@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/tonygits/test-lending-svc/pb";
+
+message LoanOffer {
+  float limit = 1;
+  float interest = 2;
+  int32 tenure = 3;
+  enum loan_type {
+    PRODUCT_A = 0;
+    PRODUCT_B = 1;
+  }
+}
