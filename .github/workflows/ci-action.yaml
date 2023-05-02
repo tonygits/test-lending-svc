@@ -13,7 +13,10 @@ on:
 
 env:
   REGISTRY: "index.docker.io"
+  DOCKER_USERNAME: "mrgitau"
   LENDING_APP_API_IMAGE_NAME: "test-lending-svc"
+  MANIFEST_REPO: "lending-app-infra"
+  GITHUB_USERNAME: "tonygits"
 
 jobs:
   test:
@@ -88,13 +91,13 @@ jobs:
           password: ${{ secrets.G_TOKEN }}
 
       - name: Build image
-        run: docker build --tag $(echo $REGISTRY)/${{ secrets.DOCKER_USER }}/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) .
+        run: docker build --tag $(echo $REGISTRY)/$(echo $DOCKER_USERNAME)/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) .
 
       - name: Remove old images
         run: if [ ! -z "$(doctl registry repository list | grep "$(echo $LENDING_APP_API_IMAGE_NAME)")" ]; then doctl registry repository delete-manifest $(echo $LENDING_APP_API_IMAGE_NAME) $(doctl registry repository list-tags $(echo $LENDING_APP_API_IMAGE_NAME) | grep -o "sha.*") --force; else echo "No repository"; fi
 
       - name: Push image to Container Registry
-        run: docker push $(echo $REGISTRY)/${{ secrets.DOCKER_USER }}/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+        run: docker push $(echo $REGISTRY)/$(echo $DOCKER_USERNAME)/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
@@ -105,15 +108,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          repository: tonygits/lending-app-infra
+          repository: $(echo $GITHUB_USERNAME)/$(echo $MANIFEST_REPO)
           ref: 'main'
           token: ${{ secrets.G_TOKEN }}
       - name: setup git config
         run: |
           git config --global user.email "gitau.ag@gmail.com"
-          git config --global user.name "tonygits"
+          git config --global user.name "Anthony Gitau"
           echo ${{ github.sha }}
-          sed -i "s#mrgitau.*#mrgitau/test-lending-svc:${{ github.sha }}#g" deployment.yaml
+          sed -i "s#$(echo $DOCKER_USERNAME).*#$(echo $DOCKER_USERNAME)/$(echo $LENDING_APP_API_IMAGE_NAME):${{ github.sha }}#g" deployment.yaml
           git add -A
           git commit -am "Update image for - ${{ github.sha }}"
       - run: echo ${{ github }}
