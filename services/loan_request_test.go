@@ -20,7 +20,7 @@ func TestUserLoanOfferRequest(t *testing.T) {
 	require.Equal(t, http.StatusOK, status)
 
 	//user limit below 1000
-	loanOffers, status, err = userLoanOfferRequest("user6")
+	_, status, err = userLoanOfferRequest("user6")
 	require.Error(t, err)
 	require.Equal(t, "we have no loan offers for you today", err.Error())
 	require.Equal(t, http.StatusNotFound, status)
@@ -67,7 +67,7 @@ func TestUserLoanOfferAcceptance(t *testing.T) {
 		Username: "user1",
 		LoanType: entities.LoadProductTypeB,
 	}
-	userLoan, status, err = userLoanOfferAcceptance(form)
+	_, _, err = userLoanOfferAcceptance(form)
 	require.Error(t, err)
 	require.Equal(t, "loan product is invalid", err.Error())
 
