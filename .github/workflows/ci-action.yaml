@@ -19,7 +19,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+    # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
       #set up go version
       - name: Set up go 1.17
@@ -62,7 +62,7 @@ jobs:
     name: Build Docker image and push to repositories
     # run only when code is compiling and tests are passing
     runs-on: ubuntu-latest
-    needs: ['test']
+    needs: [ 'test' ]
 
     # steps to perform in job
     steps:
@@ -87,18 +87,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.G_TOKEN }}
 
-      - name: Build api image
-        run: docker build --tag $(echo $REGISTRY)/mrgitau/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) .
+      - name: Build image
+        run: docker build --tag $(echo $REGISTRY)/${{ secrets.DOCKER_USER }}/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) .
 
-      - name: Push api image to Container Registry
-        run: docker push $(echo $REGISTRY)/mrgitau/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+      - name: Remove old images
+        run: if [ ! -z "$(doctl registry repository list | grep "$(echo $LENDING_APP_API_IMAGE_NAME)")" ]; then doctl registry repository delete-manifest $(echo $LENDING_APP_API_IMAGE_NAME) $(doctl registry repository list-tags $(echo $LENDING_APP_API_IMAGE_NAME) | grep -o "sha.*") --force; else echo "No repository"; fi
+
+      - name: Push image to Container Registry
+        run: docker push $(echo $REGISTRY)/${{ secrets.DOCKER_USER }}/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
   update-manifest-stage:
     runs-on: ubuntu-latest
-    needs: ['build-and-push-docker-image']
+    needs: [ 'build-and-push-docker-image' ]
     steps:
       - uses: actions/checkout@v3
         with:
