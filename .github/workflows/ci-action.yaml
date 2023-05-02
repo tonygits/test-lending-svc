@@ -93,19 +93,6 @@ jobs:
       - name: Push api image to Container Registry
         run: docker push $(echo $REGISTRY)/mrgitau/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
 
-      - name: Build image and push to Docker Hub and GitHub Container Registry
-        uses: docker/build-push-action@v2
-        with:
-          # relative path to the place where source code with Dockerfile is located
-          context: ./
-          # Note: tags has to be all lower-case
-          tags: |
-            mrgitau/test-lending-svc:${{ github.sha }}
-            ghcr.io/mrgitau/test-lending-svc:${{ github.sha }}
-
-          # build on feature branches, push only on main branch
-          push: ${{ github.ref == 'refs/heads/master' }}
-
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
@@ -123,7 +110,7 @@ jobs:
           git config --global user.email "gitau.ag@gmail.com"
           git config --global user.name "tonygits"
           echo ${{ github.sha }}
-          sed -i "s#${{ github.actor }}.*#${{ github.actor }}/test-lending-svc:${{ github.sha }}#g" deployment.yaml
+          sed -i "s#mrgitau.*#mrgitau/test-lending-svc:${{ github.sha }}#g" deployment.yaml
           git add -A
           git commit -am "Update image for - ${{ github.sha }}"
       - run: echo ${{ github }}
