@@ -107,7 +107,7 @@ func loanOffersContain(loanOffers []*entities.LoanOffer, loanSelected entities.L
 	}
 
 	for _, v := range loanOffers {
-		if strings.ToLower(v.LoanType.String()) == strings.ToLower(loanSelected.String()) {
+		if strings.EqualFold(strings.ToLower(v.LoanType.String()), strings.ToLower(loanSelected.String())) {
 			return v, true
 		}
 	}
