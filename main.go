@@ -18,6 +18,6 @@ func runGinServer() {
 
 	err = server.Start(address)
 	if err != nil {
-		log.Fatal("cannot connect server", err)
+		log.Fatal("cannot start server", err)
 	}
 }
