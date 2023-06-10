@@ -8,7 +8,7 @@ on:
 env:
   REGISTRY: "index.docker.io"
   DOCKER_USERNAME: "mrgitau"
-  LENDING_APP_API_IMAGE_NAME: "test-lending-svc"
+  LENDING_APP_API_IMAGE_NAME: "test-lending-prod-svc"
 
 jobs:
   ci-workflow:
@@ -61,11 +61,12 @@ jobs:
           ref: 'main'
           token: ${{ secrets.G_TOKEN }}
       - name: setup git config
+        working-directory: ./overlays/prod
         run: |
           git config --global user.email "gitau.ag@gmail.com"
           git config --global user.name "Anthony Gitau"
           echo $(echo $GITHUB_SHA | head -c7)
-          sed -i "s#$(echo $DOCKER_USERNAME).*#$(echo $DOCKER_USERNAME)/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)#g" deployment.yaml
+          sed -i "s#$(echo $DOCKER_USERNAME).*#$(echo $DOCKER_USERNAME)/$(echo $LENDING_APP_API_IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)#g" image.yaml
           git add -A
           git commit -am "Update image for - $(echo $GITHUB_SHA | head -c7)"
       - name: push changes
