@@ -3,7 +3,7 @@ name: 'CD - Deploy'
 on:
   push:
     branches:
-      - 'main'
+      - 'development'
 
 env:
   REGISTRY: "index.docker.io"
@@ -12,7 +12,7 @@ env:
 
 jobs:
   ci-workflow:
-    uses: tonygits/test-lending-svc/.github/workflows/ci-action.yaml@main
+    uses: tonygits/test-lending-svc/.github/workflows/ci-action.yaml@development
   build-and-push-docker-image:
     name: Build Docker image and push to repositories
     # run only when code is compiling and tests are passing
