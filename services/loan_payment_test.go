@@ -1,17 +1,18 @@
 package services
 
 import (
-	"github.com/stretchr/testify/require"
-	"github.com/tonygits/test-lending-svc/forms"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+	"github.com/tonygits/test-lending-svc/forms"
 )
 
 func TestLoanPayment(t *testing.T) {
 
 	//loan payment with correct details
 	form := &forms.LoanPayment{
-		Username: "user1",
+		Username:   "user1",
 		LoanAmount: 1100,
 	}
 
@@ -22,7 +23,7 @@ func TestLoanPayment(t *testing.T) {
 
 	//loan payment with wrong loan amount
 	form = &forms.LoanPayment{
-		Username: "user1",
+		Username:   "user1",
 		LoanAmount: 1500,
 	}
 
@@ -33,7 +34,7 @@ func TestLoanPayment(t *testing.T) {
 
 	//wrong username
 	form = &forms.LoanPayment{
-		Username: "user15",
+		Username:   "user15",
 		LoanAmount: 1100,
 	}
 

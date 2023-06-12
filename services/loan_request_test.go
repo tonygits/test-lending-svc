@@ -1,11 +1,12 @@
 package services
 
 import (
+	"net/http"
+	"testing"
+
 	"github.com/stretchr/testify/require"
 	"github.com/tonygits/test-lending-svc/entities"
 	"github.com/tonygits/test-lending-svc/forms"
-	"net/http"
-	"testing"
 )
 
 func TestUserLoanOfferRequest(t *testing.T) {

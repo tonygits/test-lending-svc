@@ -4,14 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/procyon-projects/chrono"
-	"github.com/tonygits/test-lending-svc/entities"
-	"github.com/tonygits/test-lending-svc/forms"
-	"github.com/tonygits/test-lending-svc/utils"
 	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/procyon-projects/chrono"
+	"github.com/tonygits/test-lending-svc/entities"
+	"github.com/tonygits/test-lending-svc/forms"
+	"github.com/tonygits/test-lending-svc/utils"
 )
 
 func userLoanOfferRequest(username string) ([]*entities.LoanOffer, int, error) {
