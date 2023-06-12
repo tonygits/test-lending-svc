@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/tonygits/test-lending-svc/services"
 	"log"
+
+	"github.com/tonygits/test-lending-svc/services"
 )
 
 func main() {

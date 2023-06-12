@@ -1,9 +1,10 @@
 package services
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/tonygits/test-lending-svc/forms"
-	"net/http"
 )
 
 func (s *Router) loanOfferRequestAPI(ctx *gin.Context) {

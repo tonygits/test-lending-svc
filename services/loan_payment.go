@@ -2,11 +2,12 @@ package services
 
 import (
 	"errors"
+	"net/http"
+	"time"
+
 	"github.com/tonygits/test-lending-svc/entities"
 	"github.com/tonygits/test-lending-svc/forms"
 	"github.com/tonygits/test-lending-svc/utils"
-	"net/http"
-	"time"
 )
 
 func userLoanPayment(form *forms.LoanPayment) (*entities.UserLoan, int, error) {
