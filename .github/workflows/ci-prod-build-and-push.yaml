@@ -1,4 +1,4 @@
-name: 'CD - Deploy'
+name: 'CI - Build, Push image and update manifest'
 
 on:
   push:
