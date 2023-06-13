@@ -6,8 +6,8 @@ import (
 
 func GenerateUser(username string, userLimit float64) (user *entities.User) {
 	user = &entities.User{
-		Username:    username,
-		UserLimit:   userLimit,
+		Username:  username,
+		UserLimit: userLimit,
 	}
 
 	return user
